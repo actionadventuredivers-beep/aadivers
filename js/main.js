@@ -6,19 +6,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ============ HERO VIDEO FALLBACK ============
   const heroVideo = document.querySelector('.hero-video');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (heroVideo) {
-    heroVideo.play().catch(() => {
-      // Autoplay blocked — try on first interaction
-      const playOnInteraction = () => {
-        heroVideo.play().catch(() => {});
-        document.removeEventListener('click', playOnInteraction);
-        document.removeEventListener('touchstart', playOnInteraction);
-        document.removeEventListener('scroll', playOnInteraction);
-      };
-      document.addEventListener('click', playOnInteraction, { once: false });
-      document.addEventListener('touchstart', playOnInteraction, { once: false });
-      document.addEventListener('scroll', playOnInteraction, { once: false });
-    });
+    if (prefersReducedMotion) {
+      heroVideo.pause();
+      heroVideo.removeAttribute('autoplay');
+    } else {
+      heroVideo.play().catch(() => {
+        // Autoplay blocked — try on first interaction
+        const playOnInteraction = () => {
+          heroVideo.play().catch(() => {});
+          document.removeEventListener('click', playOnInteraction);
+          document.removeEventListener('touchstart', playOnInteraction);
+          document.removeEventListener('scroll', playOnInteraction);
+        };
+        document.addEventListener('click', playOnInteraction, { once: false });
+        document.addEventListener('touchstart', playOnInteraction, { once: false });
+        document.addEventListener('scroll', playOnInteraction, { once: false });
+      });
+    }
   }
 
   // ============ NAVIGATION ============
@@ -261,13 +267,31 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   window.showToast = showToast;
 
-  // ============ PARALLAX HERO ============
+  // ============ CINEMATIC HERO POINTER LIGHT ============
   const hero = document.querySelector('.hero');
-  if (hero && window.innerWidth > 768) {
-    hero.addEventListener('mousemove', (e) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 10;
-      const y = (e.clientY / window.innerHeight - 0.5) * 10;
-      hero.style.backgroundPosition = `${50 + x}% ${50 + y}%`;
+  if (hero && window.innerWidth > 768 && !prefersReducedMotion) {
+    let heroFrame = 0;
+
+    const updateHeroPointer = (clientX, clientY) => {
+      if (heroFrame) return;
+      heroFrame = requestAnimationFrame(() => {
+        const rect = hero.getBoundingClientRect();
+        const x = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
+        const y = Math.min(Math.max((clientY - rect.top) / rect.height, 0), 1);
+        hero.style.setProperty('--hero-x', `${(x * 100).toFixed(1)}%`);
+        hero.style.setProperty('--hero-y', `${(y * 100).toFixed(1)}%`);
+        hero.style.setProperty('--hero-shift-x', `${((0.5 - x) * 12).toFixed(1)}px`);
+        hero.style.setProperty('--hero-shift-y', `${((0.5 - y) * 9).toFixed(1)}px`);
+        heroFrame = 0;
+      });
+    };
+
+    hero.addEventListener('pointermove', (e) => updateHeroPointer(e.clientX, e.clientY), { passive: true });
+    hero.addEventListener('pointerleave', () => {
+      hero.style.setProperty('--hero-x', '50%');
+      hero.style.setProperty('--hero-y', '42%');
+      hero.style.setProperty('--hero-shift-x', '0px');
+      hero.style.setProperty('--hero-shift-y', '0px');
     });
   }
 
