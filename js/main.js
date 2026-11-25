@@ -41,8 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const setAmbientUi = (playing) => {
       ambientToggle.setAttribute('aria-pressed', String(playing));
-      ambientToggle.setAttribute('aria-label', playing ? 'Turn steel pan music off' : 'Turn steel pan music on');
-      if (ambientLabel) ambientLabel.textContent = playing ? 'Steel pan music on' : 'Steel pan music off';
+      ambientToggle.setAttribute('aria-label', playing ? 'Turn underwater music off' : 'Turn underwater music on');
+      if (ambientLabel) ambientLabel.textContent = playing ? 'Underwater music on' : 'Underwater music off';
       if (ambientIcon) {
         ambientIcon.classList.toggle('fa-volume-up', playing);
         ambientIcon.classList.toggle('fa-volume-xmark', !playing);
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setAmbientUi(false);
         clearTimeout(ambientFadeTimer);
         ambientAudio.pause();
-        showToast('Steel pan music could not start. Tap the button again after interacting with the page.', 'error');
+        showToast('Underwater music could not start. Tap the button again after interacting with the page.', 'error');
       });
     };
 
