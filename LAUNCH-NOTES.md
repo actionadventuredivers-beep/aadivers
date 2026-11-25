@@ -114,13 +114,14 @@ Current domain: **aadivers.net**
 | Captain | Chili |
 | PADI | Certified Dive Center |
 
-## Pricing (as researched — confirm with Chester)
-- Single Tank: $95
-- Two-Tank: $145
+## Pricing (owner-supplied, 2026-11-25)
+- Single Tank / 1 dive: $75
+- Two-Tank / 2 dives: $150
 - Night Dive: $115
-- Discover Scuba: $170
-- Open Water Course: $595
-- Advanced Open Water: $495
+- Discover Scuba: $125
+- Open Water Course: $375 (PADI e-learning, pool sessions and open-water dives)
+- Referral Course: $300
+- Advanced Open Water / Advanced Course: $315
 - Nitrox fills: $15/tank
 
 ## Sites Covered
