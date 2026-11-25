@@ -41,8 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const setAmbientUi = (playing) => {
       ambientToggle.setAttribute('aria-pressed', String(playing));
-      ambientToggle.setAttribute('aria-label', playing ? 'Turn ambient sound off' : 'Turn ambient sound on');
-      if (ambientLabel) ambientLabel.textContent = playing ? 'Ambient sound on' : 'Ambient sound off';
+      ambientToggle.setAttribute('aria-label', playing ? 'Turn island music off' : 'Turn island music on');
+      if (ambientLabel) ambientLabel.textContent = playing ? 'Island music on' : 'Island music off';
       if (ambientIcon) {
         ambientIcon.classList.toggle('fa-volume-up', playing);
         ambientIcon.classList.toggle('fa-volume-xmark', !playing);
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setAmbientUi(false);
         clearTimeout(ambientFadeTimer);
         ambientAudio.pause();
-        showToast('Ambient sound could not start. Tap the button again after interacting with the page.', 'error');
+        showToast('Island music could not start. Tap the button again after interacting with the page.', 'error');
       });
     };
 
