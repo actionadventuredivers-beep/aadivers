@@ -27,6 +27,99 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // ============ HERO AMBIENT SOUND ============
+  const ambientAudio = document.getElementById('heroAmbient');
+  const ambientToggle = document.getElementById('ambientToggle');
+
+  if (ambientAudio && ambientToggle) {
+    const targetVolume = 0.32;
+    const ambientLabel = ambientToggle.querySelector('.ambient-toggle-label');
+    const ambientIcon = ambientToggle.querySelector('i');
+    let ambientEnabled = false;
+    let ambientFadeTimer = 0;
+    let ambientRequest = 0;
+
+    const setAmbientUi = (playing) => {
+      ambientToggle.setAttribute('aria-pressed', String(playing));
+      ambientToggle.setAttribute('aria-label', playing ? 'Turn ambient sound off' : 'Turn ambient sound on');
+      if (ambientLabel) ambientLabel.textContent = playing ? 'Ambient sound on' : 'Ambient sound off';
+      if (ambientIcon) {
+        ambientIcon.classList.toggle('fa-volume-up', playing);
+        ambientIcon.classList.toggle('fa-volume-xmark', !playing);
+      }
+    };
+
+    const fadeAmbient = (target, onComplete) => {
+      clearTimeout(ambientFadeTimer);
+      const from = ambientAudio.volume;
+      const duration = 600;
+      const started = performance.now();
+
+      const step = () => {
+        const progress = Math.min((performance.now() - started) / duration, 1);
+        const eased = progress * progress * (3 - 2 * progress);
+        ambientAudio.volume = Math.max(0, Math.min(1, from + (target - from) * eased));
+        if (progress < 1) {
+          ambientFadeTimer = setTimeout(step, 32);
+        } else if (onComplete) {
+          onComplete();
+        }
+      };
+
+      step();
+    };
+
+    const startAmbient = () => {
+      const request = ++ambientRequest;
+      ambientEnabled = true;
+      setAmbientUi(true);
+      ambientAudio.volume = 0;
+      fadeAmbient(targetVolume);
+      ambientAudio.play().catch(() => {
+        if (request !== ambientRequest) return;
+        ambientEnabled = false;
+        setAmbientUi(false);
+        clearTimeout(ambientFadeTimer);
+        ambientAudio.pause();
+        showToast('Ambient sound could not start. Tap the button again after interacting with the page.', 'error');
+      });
+    };
+
+    const stopAmbient = () => {
+      ambientRequest += 1;
+      ambientEnabled = false;
+      setAmbientUi(false);
+      fadeAmbient(0, () => ambientAudio.pause());
+    };
+
+    ambientAudio.volume = 0;
+    ambientToggle.addEventListener('click', () => {
+      if (ambientEnabled || !ambientAudio.paused) {
+        stopAmbient();
+      } else {
+        startAmbient();
+      }
+    });
+
+    ambientAudio.addEventListener('error', () => {
+      ambientEnabled = false;
+      setAmbientUi(false);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && ambientEnabled) stopAmbient();
+    });
+
+    const heroSection = document.querySelector('.hero');
+    if (heroSection && 'IntersectionObserver' in window) {
+      const ambientObserver = new IntersectionObserver((entries) => {
+        const visible = entries.some(entry => entry.isIntersecting);
+        if (!visible && ambientEnabled) stopAmbient();
+      }, { threshold: 0.15 });
+      ambientObserver.observe(heroSection);
+    }
+  }
+
   // ============ NAVIGATION ============
   const navbar = document.getElementById('navbar');
   const navToggle = document.getElementById('navToggle');
